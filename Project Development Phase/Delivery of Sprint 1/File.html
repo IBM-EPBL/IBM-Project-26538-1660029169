@@ -1,0 +1,138 @@
+from google.colab import drive
+drive.mount('/content/drive')
+
+Drive already mounted at /content/drive; to attempt to forcibly remount, call drive.mount("/content/drive", force_remount=True).
+
+from tensorflow.keras.preprocessing.image import ImageDataGenerator
+train_datagen = ImageDataGenerator(rescale=1./255,zoom_range=0.2,horizontal_flip=True,shear_range=0.2)
+test_datagen = ImageDataGenerator(rescale=1./255)
+
+x_train=train_datagen.flow_from_directory("/content/drive/MyDrive/dataset/train_set",target_size=(64,64),class_mode='categorical',batch_size=5,color_mode='rgb')
+x_test=test_datagen.flow_from_directory(r"/content/drive/MyDrive/dataset/test_set",target_size=(64,64),class_mode='categorical',batch_size=5,color_mode='rgb')
+
+Found 742 images belonging to 4 classes.
+Found 198 images belonging to 4 classes.
+
+import numpy as np
+import tensorflow
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense,Conv2D,MaxPooling2D,Flatten
+
+model=Sequential()
+model.add(Conv2D(32,(3,3),input_shape=(64,64,3),activation='relu'))
+model.add(MaxPooling2D(pool_size=(2,2)))
+model.add(Conv2D(32,(3,3),activation='relu'))
+model.add(MaxPooling2D(pool_size=(2,2)))
+model.add(Flatten())
+model.add(Dense(units=128,activation='relu'))
+model.add(Dense(units=4,activation='softmax'))
+model.compile(loss='categorical_crossentropy',optimizer='adam',metrics=['accuracy'])
+
+model.summary()
+
+Model: "sequential_1"
+_________________________________________________________________
+ Layer (type)                Output Shape              Param #   
+=================================================================
+ conv2d_2 (Conv2D)           (None, 62, 62, 32)        896       
+                                                                 
+ max_pooling2d_2 (MaxPooling  (None, 31, 31, 32)       0         
+ 2D)                                                             
+                                                                 
+ conv2d_3 (Conv2D)           (None, 29, 29, 32)        9248      
+                                                                 
+ max_pooling2d_3 (MaxPooling  (None, 14, 14, 32)       0         
+ 2D)                                                             
+                                                                 
+ flatten_1 (Flatten)         (None, 6272)              0         
+                                                                 
+ dense_2 (Dense)             (None, 128)               802944    
+                                                                 
+ dense_3 (Dense)             (None, 4)                 516       
+                                                                 
+=================================================================
+Total params: 813,604
+Trainable params: 813,604
+Non-trainable params: 0
+_________________________________________________________________
+
+model.fit_generator(generator=x_train,steps_per_epoch=len(x_train),validation_data=x_test,validation_steps=len(x_test),epochs=20)
+
+Epoch 1/20
+
+/usr/local/lib/python3.7/dist-packages/ipykernel_launcher.py:1: UserWarning: `Model.fit_generator` is deprecated and will be removed in a future version. Please use `Model.fit`, which supports generators.
+  """Entry point for launching an IPython kernel.
+
+149/149 [==============================] - 44s 293ms/step - loss: 1.1635 - accuracy: 0.4798 - val_loss: 0.9364 - val_accuracy: 0.6566
+Epoch 2/20
+149/149 [==============================] - 41s 273ms/step - loss: 0.8416 - accuracy: 0.6429 - val_loss: 0.8283 - val_accuracy: 0.6717
+Epoch 3/20
+149/149 [==============================] - 42s 284ms/step - loss: 0.6678 - accuracy: 0.7655 - val_loss: 0.7795 - val_accuracy: 0.7323
+Epoch 4/20
+149/149 [==============================] - 41s 273ms/step - loss: 0.6775 - accuracy: 0.7493 - val_loss: 0.6493 - val_accuracy: 0.7626
+Epoch 5/20
+149/149 [==============================] - 41s 273ms/step - loss: 0.5995 - accuracy: 0.7749 - val_loss: 0.6781 - val_accuracy: 0.7879
+Epoch 6/20
+149/149 [==============================] - 41s 273ms/step - loss: 0.5397 - accuracy: 0.7817 - val_loss: 0.8131 - val_accuracy: 0.7172
+Epoch 7/20
+149/149 [==============================] - 42s 285ms/step - loss: 0.4696 - accuracy: 0.8275 - val_loss: 0.6780 - val_accuracy: 0.7879
+Epoch 8/20
+149/149 [==============================] - 41s 272ms/step - loss: 0.4959 - accuracy: 0.8194 - val_loss: 0.8018 - val_accuracy: 0.7576
+Epoch 9/20
+149/149 [==============================] - 41s 273ms/step - loss: 0.3969 - accuracy: 0.8544 - val_loss: 0.6865 - val_accuracy: 0.7828
+Epoch 10/20
+149/149 [==============================] - 41s 273ms/step - loss: 0.3885 - accuracy: 0.8652 - val_loss: 0.8218 - val_accuracy: 0.7677
+Epoch 11/20
+149/149 [==============================] - 42s 280ms/step - loss: 0.3552 - accuracy: 0.8652 - val_loss: 1.0350 - val_accuracy: 0.7374
+Epoch 12/20
+149/149 [==============================] - 41s 273ms/step - loss: 0.3266 - accuracy: 0.8801 - val_loss: 0.7144 - val_accuracy: 0.7778
+Epoch 13/20
+149/149 [==============================] - 40s 268ms/step - loss: 0.2738 - accuracy: 0.8949 - val_loss: 0.6965 - val_accuracy: 0.7879
+Epoch 14/20
+149/149 [==============================] - 40s 271ms/step - loss: 0.2957 - accuracy: 0.8827 - val_loss: 0.7882 - val_accuracy: 0.7677
+Epoch 15/20
+149/149 [==============================] - 42s 283ms/step - loss: 0.2576 - accuracy: 0.9084 - val_loss: 1.0848 - val_accuracy: 0.7525
+Epoch 16/20
+149/149 [==============================] - 41s 271ms/step - loss: 0.2901 - accuracy: 0.8976 - val_loss: 0.8777 - val_accuracy: 0.7828
+Epoch 17/20
+149/149 [==============================] - 41s 271ms/step - loss: 0.2853 - accuracy: 0.9097 - val_loss: 1.1820 - val_accuracy: 0.7273
+Epoch 18/20
+149/149 [==============================] - 42s 276ms/step - loss: 0.2219 - accuracy: 0.9272 - val_loss: 0.8731 - val_accuracy: 0.7929
+Epoch 19/20
+149/149 [==============================] - 41s 275ms/step - loss: 0.1894 - accuracy: 0.9353 - val_loss: 1.0621 - val_accuracy: 0.7374
+Epoch 20/20
+149/149 [==============================] - 40s 269ms/step - loss: 0.2297 - accuracy: 0.9151 - val_loss: 1.1963 - val_accuracy: 0.7374
+
+model.save('analysis.h5')
+model_json=model.to_json()
+with open("model-bw.json","w") as json_file:
+  json_file.write(model_json)
+
+from tensorflow.keras.models import load_model
+from tensorflow.keras.preprocessing import image
+model=load_model('analysis.h5')
+
+x_train.class_indices
+
+{'Cyclone': 0, 'Earthquake': 1, 'Flood': 2, 'Wildfire': 3}
+
+img = image.load_img(r"/content/drive/MyDrive/dataset/test_set/Earthquake/1347.jpg",target_size=(64,64))
+x=image.img_to_array(img)
+x=np.expand_dims(x,axis=0)
+index=['Cyclone','Earthquake','Flood','Wildfire']
+y=np.argmax(model.predict(x),axis=1)
+print(index[int(y)])
+
+1/1 [==============================] - 0s 82ms/step
+Earthquake
+
+img = image.load_img(r"/content/drive/MyDrive/dataset/test_set/Cyclone/918.jpg",target_size=(64,64))
+x=image.img_to_array(img)
+x=np.expand_dims(x,axis=0)
+index=['Cyclone','Earthquake','Flood','Wildfire']
+y=np.argmax(model.predict(x),axis=1)
+print(index[int(y)])
+
+1/1 [==============================] - 0s 23ms/step
+Cyclone
+
